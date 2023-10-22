@@ -30,6 +30,17 @@ class MyAppState extends ChangeNotifier {
     currentWord = WordPair.random();
     notifyListeners();
   }
+
+  var favrouiteWords = <WordPair>[];
+
+  void toggleFavorite() {
+    if (favrouiteWords.contains(currentWord)) {
+      favrouiteWords.remove(currentWord);
+    } else {
+      favrouiteWords.add(currentWord);
+    }
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -39,22 +50,56 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appstate = context.watch<MyAppState>();
     var currentWord = appstate.currentWord;
+
+    IconData icon;
+    if (appstate.favrouiteWords.contains(currentWord)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border_sharp;
+    }
+
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ConstantText(),
             RandomWords(currentWord: currentWord),
-            ElevatedButton(
-              onPressed: () {
-                appstate.getNext();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                shape: const StadiumBorder(),
-              ),
-              child: const Text("Next Word"),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    appstate.toggleFavorite();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    shape: const StadiumBorder(),
+                    elevation: 20,
+                  ),
+                  icon: Icon(
+                    icon,
+                    color: Colors.pink,
+                  ),
+                  label: const Text("Favorite"),
+                ),
+
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    appstate.getNext();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    shape: const StadiumBorder(),
+                    elevation: 20,
+                  ),
+                  child: const Text("Next Word"),
+                ),
+              ],
             )
           ],
         ),
@@ -70,7 +115,10 @@ class ConstantText extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Text("Random Word:",
-      style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 30)),
+          style: TextStyle(
+              color: theme.colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              fontSize: 30)),
     );
   }
 }
@@ -93,8 +141,11 @@ class RandomWords extends StatelessWidget {
       color: theme.colorScheme.primary,
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Text(currentWord.asPascalCase,
-            style: TextStyle(color: theme.colorScheme.onPrimary, fontSize: 30)),
+        child: Text(
+          currentWord.asPascalCase,
+          style: TextStyle(color: theme.colorScheme.onPrimary, fontSize: 30),
+          semanticsLabel: "${currentWord.first} ${currentWord.second}",
+        ),
       ),
     );
   }
