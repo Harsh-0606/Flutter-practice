@@ -33,12 +33,17 @@ class MyAppState extends ChangeNotifier {
 
   var favrouiteWords = <WordPair>[];
 
-  void toggleFavorite() {
+  void toggleFavorite(WordPair currentWord) {
     if (favrouiteWords.contains(currentWord)) {
       favrouiteWords.remove(currentWord);
     } else {
       favrouiteWords.add(currentWord);
     }
+    notifyListeners();
+  }
+    void removeFavorite(WordPair pair) {
+    print('word removed ${favrouiteWords.length}');
+    favrouiteWords.remove(pair);
     notifyListeners();
   }
 }
@@ -122,7 +127,7 @@ class Favourite extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(20),
-          child: Text('You have'
+          child: Text('You have '
           '${appstate.favrouiteWords.length} favorites:', style: TextStyle(
             fontSize: 25,
             color: Theme.of(context).colorScheme.onPrimary,
@@ -130,7 +135,13 @@ class Favourite extends StatelessWidget {
         ),
         for( var word in appstate.favrouiteWords)
           ListTile(
-            leading: Icon(Icons.favorite, color: Colors.pink,),
+            leading: IconButton(
+              icon: const Icon(Icons.delete, semanticLabel: 'delete',),
+              onPressed: () {
+                appstate.removeFavorite(word);
+              }
+              , color: Colors.pink,
+              ),
             title: Text(word.asPascalCase, style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),),
           )
         
@@ -166,7 +177,7 @@ class GeneratorPage extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  appstate.toggleFavorite();
+                  appstate.toggleFavorite(currentWord);
                 },
                 icon: Icon(icon),
                 label: const Text("Favorite"),
